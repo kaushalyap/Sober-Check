@@ -1,17 +1,14 @@
 package com.example.sobercheck.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.ActivityMainBinding
-import com.google.android.material.bottomappbar.BottomAppBar
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,9 +36,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
+        when (item.itemId) {
             R.id.settings -> navController.navigate(R.id.action_main_to_settings)
         }
         return true
+    }
+
+    fun showFab() {
+        binding.fabCheck.show()
+    }
+
+    fun hideFab() {
+        binding.fabCheck.hide()
+    }
+
+    fun showBottomBar() {
+        binding.bottomAppBar.performHide()
+    }
+
+    fun hideBottomBar() {
+        binding.bottomAppBar.performHide()
     }
 }

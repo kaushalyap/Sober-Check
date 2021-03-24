@@ -1,13 +1,12 @@
 package com.example.sobercheck.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
-import com.example.sobercheck.databinding.FragmentDrunkBinding
-import com.example.sobercheck.databinding.FragmentSoberBinding
 import com.example.sobercheck.databinding.FragmentWalkingExerciseBinding
 
 class WalkingExerciseFragment : Fragment() {
@@ -18,8 +17,12 @@ class WalkingExerciseFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentWalkingExerciseBinding.inflate(inflater, container, false)
+
+        binding.btnDone.setOnClickListener {
+            findNavController().navigate(R.id.action_walkingExercise_to_sober)
+        }
         return binding.root
     }
 
