@@ -6,15 +6,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.example.sobercheck.R
+import com.example.sobercheck.databinding.FragmentDrunkBinding
+import com.example.sobercheck.databinding.FragmentMainBinding
+import com.example.sobercheck.databinding.FragmentSettingsBinding
 
 
 class MainFragment : Fragment() {
 
+    private var _binding: FragmentMainBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_main, container, false)
+        _binding = FragmentMainBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
