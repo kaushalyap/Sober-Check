@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.sobercheck.ui.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_main_to_selfie"
+            app:destination="@id/selfieFragment" />
+        <action
+            android:id="@+id/action_main_to_settings"
+            app:destination="@id/settingsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.example.sobercheck.ui.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" />
+    <fragment
+        android:id="@+id/selfieFragment"
+        android:name="com.example.sobercheck.ui.SelfieFragment"
+        android:label="fragment_selfie"
+        tools:layout="@layout/fragment_selfie" >
+        <action
+            android:id="@+id/action_selfieFragment_to_walkingExerciseFragment"
+            app:destination="@id/walkingExerciseFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/walkingExerciseFragment"
+        android:name="com.example.sobercheck.ui.WalkingExerciseFragment"
+        android:label="fragment_walking_exercise"
+        tools:layout="@layout/fragment_walking_exercise" />
+</navigation>
