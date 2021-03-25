@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.sobercheck.databinding.FragmentDrunkBinding
+import com.example.sobercheck.model.UberService
 import com.example.sobercheck.ui.activities.MainActivity
 import com.example.sobercheck.ui.utils.PermissionCode
 
@@ -28,16 +29,13 @@ class DrunkFragment : Fragment() {
         _binding = FragmentDrunkBinding.inflate(inflater, container, false)
         mainActivity = activity as MainActivity
         setButtonClickListeners()
+        binding.btnRideRequest.setRideParameters(UberService().getRideRequest())
         return binding.root
     }
 
 
     private fun setButtonClickListeners() {
-        binding.rideRequestButton.setOnClickListener {
 
-//            val uber = UberService()
-//            uber.setRideParams()
-        }
 
         binding.btnCall.setOnClickListener {
             if (ContextCompat.checkSelfPermission(
