@@ -21,20 +21,12 @@ class SoberFragment : Fragment() {
     ): View {
 
         _binding = FragmentSoberBinding.inflate(inflater, container, false)
-        hideFabBottomAppBar()
         return binding.root
     }
-
-    private fun hideFabBottomAppBar() {
-        mainActivity = activity as MainActivity
-        mainActivity.hideFabBottomAppBar()
-    }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        mainActivity.showFabBottomAppBar()
 
     }
 }

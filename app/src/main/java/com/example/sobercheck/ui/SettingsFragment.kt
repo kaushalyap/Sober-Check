@@ -10,17 +10,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 
-        hideFabBottomAppBar()
         setPreferencesFromResource(R.xml.preferences, rootKey)
-    }
-
-    private fun hideFabBottomAppBar() {
-        mainActivity = activity as MainActivity
-        mainActivity.hideFabBottomAppBar()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mainActivity.showFabBottomAppBar()
     }
 }

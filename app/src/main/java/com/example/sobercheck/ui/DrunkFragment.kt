@@ -20,18 +20,11 @@ class DrunkFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDrunkBinding.inflate(inflater, container, false)
-        hideFabBottomAppBar()
         return binding.root
-    }
-
-    private fun hideFabBottomAppBar() {
-        mainActivity = activity as MainActivity
-        mainActivity.hideFabBottomAppBar()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        mainActivity.showFabBottomAppBar()
     }
 }
