@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.sobercheck.ui.MainFragment"
+        android:name="com.example.sobercheck.ui.fragments.MainFragment"
         android:label="fragment_main"
         tools:layout="@layout/fragment_main" >
         <action
@@ -19,12 +19,12 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.example.sobercheck.ui.SettingsFragment"
+        android:name="com.example.sobercheck.ui.fragments.SettingsFragment"
         android:label="fragment_settings"
         tools:layout="@layout/fragment_settings" />
     <fragment
         android:id="@+id/selfieFragment"
-        android:name="com.example.sobercheck.ui.SelfieFragment"
+        android:name="com.example.sobercheck.ui.fragments.SelfieFragment"
         android:label="fragment_selfie"
         tools:layout="@layout/fragment_selfie">
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/walkingExerciseFragment"
-        android:name="com.example.sobercheck.ui.WalkingExerciseFragment"
+        android:name="com.example.sobercheck.ui.fragments.WalkingExerciseFragment"
         android:label="fragment_walking_exercise"
         tools:layout="@layout/fragment_walking_exercise">
         <action
@@ -48,12 +48,12 @@
     </fragment>
     <fragment
         android:id="@+id/drunkFragment"
-        android:name="com.example.sobercheck.ui.DrunkFragment"
+        android:name="com.example.sobercheck.ui.fragments.DrunkFragment"
         android:label="fragment_drunk"
         tools:layout="@layout/fragment_drunk" />
     <fragment
         android:id="@+id/soberFragment"
-        android:name="com.example.sobercheck.ui.SoberFragment"
+        android:name="com.example.sobercheck.ui.fragments.SoberFragment"
         android:label="fragment_sober"
         tools:layout="@layout/fragment_sober" />
 </navigation>

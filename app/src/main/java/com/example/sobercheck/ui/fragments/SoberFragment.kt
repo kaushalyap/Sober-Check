@@ -1,4 +1,4 @@
-package com.example.sobercheck.ui
+package com.example.sobercheck.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.sobercheck.databinding.FragmentSoberBinding
+import com.example.sobercheck.ui.activities.MainActivity
 
 class SoberFragment : Fragment() {
 

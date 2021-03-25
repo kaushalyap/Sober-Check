@@ -1,4 +1,4 @@
-package com.example.sobercheck.ui
+package com.example.sobercheck.ui.fragments
 
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
@@ -6,7 +6,6 @@ import com.example.sobercheck.R
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private lateinit var mainActivity: MainActivity
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 

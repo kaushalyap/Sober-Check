@@ -7,7 +7,7 @@
         <EditTextPreference
             app:icon="@drawable/ic_contact_24"
             app:key="emergency-contact"
-            app:summary=""
+            app:summary="Who to contact when drunk"
             app:title="Emergency Contact">
             <intent
                 android:action="android.intent.action.ACTION_PICK"
@@ -27,10 +27,20 @@
             app:title="Call" />
 
         <SwitchPreferenceCompat
-            app:icon="@drawable/ic_speaker_24"
+            app:icon="@drawable/ic_location_24"
             app:key="audio-alert"
             app:summary="Play audio alert"
             app:title="Audio alert" />
+
+        <EditTextPreference
+            app:icon="@drawable/ic_contact_24"
+            app:key="drop-off-location"
+            app:summary="Uber drop off location"
+            app:title="Drop Off Location">
+            <intent
+                android:action="android.intent.action.ACTION_PICK"
+                android:mimeType="CommonDataKinds.Phone.CONTENT_TYPE" />
+        </EditTextPreference>
 
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_car_24"
