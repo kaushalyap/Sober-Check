@@ -5,21 +5,21 @@
     xmlns:uber="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.DrunkFragment"
-    android:padding="16dp">
+    android:padding="16dp"
+    tools:context=".ui.DrunkFragment">
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintVertical_chainStyle="packed"
-        android:text="You are drunk, Please avoid driving"
+        android:text="@string/you_are_drunk_please_avoid_driving"
         android:textAlignment="center"
         android:textSize="32sp"
         android:textStyle="bold"
+        app:layout_constraintVertical_chainStyle="packed"
         app:layout_constraintBottom_toTopOf="@+id/imageView2"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="16dp"/>
+        tools:layout_editor_absoluteX="16dp" />
 
 
     <ImageView
@@ -27,35 +27,53 @@
         android:layout_width="wrap_content"
         android:layout_height="300dp"
         android:src="@drawable/img_sad"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/rideRequestButton"
+        android:contentDescription="@string/sad_face"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
-        tools:layout_editor_absoluteX="0dp"
-        android:layout_marginBottom="16dp" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.uber.sdk.android.rides.RideRequestButton
         android:id="@+id/rideRequestButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toTopOf="@+id/btn_call"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/imageView2"
         app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        uber:ub__style="black"
-        android:layout_marginBottom="8dp"/>
+        uber:ub__style="black" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_call"
         android:layout_width="0dp"
         android:layout_height="72dp"
-        android:text="Call Emergency Contact"
+        android:layout_marginTop="8dp"
+        android:text="@string/call_emergency_contact"
+        android:textAllCaps="false"
         app:icon="@drawable/ic_call_24"
         app:iconPadding="0dp"
-        android:textAllCaps="false"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btn_sms"
         app:layout_constraintEnd_toEndOf="@+id/rideRequestButton"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/rideRequestButton"
         app:layout_constraintTop_toBottomOf="@+id/rideRequestButton" />
 
-
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sms"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:text="@string/sms_emergency_contact"
+        android:textAllCaps="false"
+        app:icon="@drawable/ic_sms_24"
+        app:iconPadding="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/btn_call"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="@+id/btn_call"
+        app:layout_constraintTop_toBottomOf="@+id/btn_call" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

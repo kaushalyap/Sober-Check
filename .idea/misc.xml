@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../../layout/custom_preview.xml" value="0.42314814814814816" />
         <entry key="app/src/main/res/drawable/ic_baseline_settings_24.xml" value="0.42604166666666665" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.42604166666666665" />
         <entry key="app/src/main/res/drawable/ic_stethoscope.xml" value="0.42604166666666665" />
@@ -16,6 +17,7 @@
         <entry key="app/src/main/res/layout/fragment_sober.xml" value="0.3088768115942029" />
         <entry key="app/src/main/res/layout/fragment_walking_exercise.xml" value="0.3088768115942029" />
         <entry key="app/src/main/res/menu/bottom_app_bar.xml" value="0.40989583333333335" />
+        <entry key="app/src/main/res/xml/preferences.xml" value="0.3088768115942029" />
       </map>
     </option>
   </component>

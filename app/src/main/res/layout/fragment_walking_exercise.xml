@@ -14,13 +14,14 @@
         android:src="@drawable/img_walking"
         app:layout_constraintBottom_toTopOf="@+id/textView5"
         app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/man_walking"
         app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/textView5"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Walk few steps ahead"
+        android:text="@string/walk_few_steps_ahead"
         android:textSize="32sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_done"
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
@@ -38,6 +39,7 @@
         app:layout_constraintEnd_toEndOf="@+id/textView5"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="@+id/textView5"
+        android:contentDescription="@string/right_mark"
         app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

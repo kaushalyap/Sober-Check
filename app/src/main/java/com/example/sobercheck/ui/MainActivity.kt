@@ -42,19 +42,13 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun showFab() {
+    fun showFabBottomAppBar() {
         binding.fabCheck.show()
+        binding.bottomAppBar.performShow()
     }
 
-    fun hideFab() {
+    fun hideFabBottomAppBar() {
         binding.fabCheck.hide()
-    }
-
-    fun showBottomBar() {
-        binding.bottomAppBar.performHide()
-    }
-
-    fun hideBottomBar() {
         binding.bottomAppBar.performHide()
     }
 }

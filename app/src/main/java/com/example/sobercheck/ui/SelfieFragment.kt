@@ -13,6 +13,7 @@ class SelfieFragment : Fragment() {
 
     private var _binding: FragmentSelfieBinding? = null
     private val binding get() = _binding!!
+    private lateinit var mainActivity: MainActivity
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,19 +25,21 @@ class SelfieFragment : Fragment() {
 
         binding.btnCamera.setOnClickListener {
             findNavController().navigate(R.id.action_selfie_to_walkingExercise)
+            hideFabBottomAppBar()
         }
-
         return binding.root
     }
 
     private fun hideFabBottomAppBar() {
-        val mainActivity = activity as MainActivity
-        mainActivity.hideFab()
-        mainActivity.hideBottomBar()
+        mainActivity = activity as MainActivity
+        mainActivity.hideFabBottomAppBar()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        mainActivity.showFabBottomAppBar()
     }
+
+
 }
