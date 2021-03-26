@@ -3,6 +3,8 @@ package com.example.sobercheck.model
 import com.uber.sdk.android.core.UberSdk
 import com.uber.sdk.android.rides.RideParameters
 import com.uber.sdk.rides.client.SessionConfiguration
+
+
 const val CLIENT_ID = "Xr5TFJyIAFj074yHrYm2txrXxCDdWA8m"
 
 class UberService {

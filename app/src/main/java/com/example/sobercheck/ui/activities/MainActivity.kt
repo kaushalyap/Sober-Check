@@ -1,17 +1,13 @@
 package com.example.sobercheck.ui.activities
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.telephony.SmsManager
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -60,48 +56,12 @@ class MainActivity : AppCompatActivity() {
         binding.bottomAppBar.performHide()
     }
 
-    fun makeRequest(permission: String, requestCode: Int) {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
-            AlertDialog.Builder(this).setTitle("Hello")
-        } else {
-            ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
-        }
-    }
-
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        when (requestCode) {
-            1 -> {
-
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Log.d("PERMISSION", "Calling permission has been denied!")
-                } else {
-                    Log.d("PERMISSION", "Calling permission has been granted!")
-                    makeCall()
-                }
-            }
-            2 -> {
-                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                    Log.d("PERMISSION", "Sending SMS permission has been denied!")
-
-                } else {
-                    Log.d("PERMISSION", "Sending SMS permission has been granted!")
-                    sendSMS()
-                }
-            }
-        }
-    }
-
     fun makeCall() {
         val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:1234567890"))
         startActivity(intent)
     }
 
-    fun sendSMS() {
+    private fun sendSMS() {
         val userName = "John"
         val emergencyContactNo = "1234567890"
         val messageBody =
