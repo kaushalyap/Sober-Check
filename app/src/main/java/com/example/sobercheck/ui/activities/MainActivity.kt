@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         startActivity(intent)
     }
 
-    private fun sendSMS() {
+    fun sendSMS() {
         val userName = "John"
         val emergencyContactNo = "1234567890"
         val messageBody =
