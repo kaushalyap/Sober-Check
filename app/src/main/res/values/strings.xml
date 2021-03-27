@@ -28,5 +28,20 @@
     <string name="permission_contacts_never_ask_again">Contact read permission will be never asked again!</string>
     <string name="permission_contacts_denied">Contacts read permission was denied!</string>
     <string name="permission_contacts_rationale">Contact read permission is necessary pick an emergency contact</string>
+    <string name="pref_sms">sms</string>
+    <string name="pref_emergency_contact">emergency-contact</string>
+    <string name="pref_alert">audio-alert</string>
+    <string name="pref_call">call</string>
+    <string name="pref_drop_off_location">drop-off-location</string>
+    <string name="pref_uber">uber</string>
+    <string name="pref_run_in_background">run-in-background</string>
+    <string name="permission_location_never_ask_again">Location permission will be never asked again!</string>
+    <string name="permission_location_denied">Location permission request was denied!</string>
+    <string name="permission_location_rationale">Location permission is required to order an Uber at current location</string>
+
+    <string name="okay">Okay</string>
+    <string name="message_sent">Message Sent!</string>
+    <string name="sms_dialog_body">"A message was already sent to your emergency contact"</string>
+    <string name="uber_dialog_body">"An Uber was already dispatched to your location"</string>
 
 </resources>

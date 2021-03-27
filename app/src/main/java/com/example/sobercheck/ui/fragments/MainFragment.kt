@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
+import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentMainBinding
 import com.example.sobercheck.ui.activities.MainActivity
 
@@ -23,6 +25,9 @@ class MainFragment : Fragment() {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         mainActivity = activity as MainActivity
         showFabBottomAppBar()
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val address = sharedPreferences.getString(getString(R.string.pref_drop_off_location), "")
+        binding.textView.text = address
         return binding.root
     }
 

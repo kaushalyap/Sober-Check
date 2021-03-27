@@ -1,60 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="Automated Response">
 
         <EditTextPreference
             app:icon="@drawable/ic_contact_24"
-            app:key="emergency-contact"
+            app:defaultValue="911"
+            app:key="@string/pref_emergency_contact"
             app:summary="Who to contact when drunk"
-            app:title="Emergency Contact">
-            <intent
-                android:action="android.intent.action.ACTION_PICK"
-                android:mimeType="CommonDataKinds.Phone.CONTENT_TYPE" />
-        </EditTextPreference>
+            app:title="Emergency Contact" />
 
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_sms_24"
-            app:key="sms"
+            app:defaultValue="false"
+            app:key="@string/pref_sms"
             app:summary="Send SMS to emergency contact"
             app:title="SMS" />
 
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_call_24"
-            app:key="call"
+            app:defaultValue="false"
+            app:key="@string/pref_call"
             app:summary="Call emergency contact"
             app:title="Call" />
 
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_location_24"
-            app:key="audio-alert"
+            app:defaultValue="false"
+            app:key="@string/pref_alert"
             app:summary="Play audio alert"
             app:title="Audio alert" />
 
         <EditTextPreference
             app:icon="@drawable/ic_contact_24"
-            app:key="drop-off-location"
+            app:defaultValue="Akmeemana Galle"
             app:summary="Uber drop off location"
-            app:title="Drop Off Location">
-            <intent
-                android:action="android.intent.action.ACTION_PICK"
-                android:mimeType="CommonDataKinds.Phone.CONTENT_TYPE" />
-        </EditTextPreference>
+            app:key="@string/pref_drop_off_location"
+            app:title="Drop Off Location" />
 
         <SwitchPreferenceCompat
             app:icon="@drawable/ic_car_24"
-            app:key="uber"
+            app:defaultValue="false"
             app:summary="Order an Uber at current location"
+            app:key="@string/pref_uber"
             app:title="Order an Uber" />
 
 
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="Privacy">
-        <SwitchPreferenceCompat
-            app:key="run-in-background"
-            app:summary="Run Sober check analysis in background"
-            app:title="Run in background" />
     </PreferenceCategory>
 </PreferenceScreen>

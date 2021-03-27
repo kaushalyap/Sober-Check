@@ -1,65 +1,78 @@
 package com.example.sobercheck.ui.fragments
 
-import android.Manifest
+import android.app.Activity.RESULT_OK
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import android.provider.ContactsContract
+import androidx.preference.EditTextPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.example.sobercheck.R
-import permissions.dispatcher.PermissionRequest
-import permissions.dispatcher.ktx.PermissionsRequester
-import permissions.dispatcher.ktx.constructPermissionsRequest
+
+
+const val CONTACT_PICKER_RESULT: Int = 1
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
-    private lateinit var contactReadPermissionsRequester: PermissionsRequester
-
+    private var prefEmergencyContact: Preference? = null
+    private var prefDropOffLocation: EditTextPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
 
         setPreferencesFromResource(R.xml.preferences, rootKey)
+        setupPreferenceListeners()
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        contactReadPermissionsRequester = constructPermissionsRequest(
-            Manifest.permission.CAMERA,
-            onShowRationale = ::onContactReadShowRationale,
-            onPermissionDenied = ::onContactReadDenied,
-            onNeverAskAgain = ::onContactReadNeverAskAgain,
-            requiresPermission = ::readContacts
-        )
+    private fun setupPreferenceListeners() {
+        prefEmergencyContact = findPreference(getString(R.string.pref_emergency_contact))
+
+        prefEmergencyContact?.setOnPreferenceClickListener {
+            val contactPickerIntent = Intent(Intent.ACTION_PICK)
+            contactPickerIntent.type = ContactsContract.CommonDataKinds.Phone.CONTENT_TYPE
+            startActivityForResult(contactPickerIntent, CONTACT_PICKER_RESULT)
+            true
+        }
+
+        prefDropOffLocation = findPreference(getString(R.string.pref_drop_off_location))
+
+        prefDropOffLocation?.summaryProvider =
+            Preference.SummaryProvider<EditTextPreference> { preference ->
+                preference.text
+            }
+
     }
 
-    private fun readContacts() {
-        TODO("Not yet implemented")
-    }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == CONTACT_PICKER_RESULT && resultCode == RESULT_OK) {
 
-    private fun onContactReadNeverAskAgain() {
-        Toast.makeText(
-            requireContext(),
-            R.string.permission_contacts_never_ask_again,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
+            val contactUri = data?.data
+            val projection = arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val cursor = contactUri?.let {
+                context?.contentResolver?.query(
+                    it, projection,
+                    null, null, null
+                )
+            }
 
-    private fun onContactReadDenied() {
-        Toast.makeText(requireContext(), R.string.permission_contacts_denied, Toast.LENGTH_SHORT)
-            .show()
-    }
+            if (cursor != null && cursor.moveToFirst()) {
+                val numberIndex =
+                    cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+                val number = cursor.getString(numberIndex)
 
-    private fun onContactReadShowRationale(request: PermissionRequest) {
-        showRationaleDialog(R.string.permission_contacts_rationale, request)
-    }
+                val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+                with(sharedPref.edit()) {
+                    putString(getString(R.string.pref_emergency_contact), number)
+                    apply()
+                }
 
-    private fun showRationaleDialog(@StringRes messageResId: Int, request: PermissionRequest) {
-        AlertDialog.Builder(requireContext())
-            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
-            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
-            .setCancelable(false)
-            .setMessage(messageResId)
-            .show()
+                prefEmergencyContact = findPreference(getString(R.string.pref_emergency_contact))
+                prefEmergencyContact?.summaryProvider =
+                    Preference.SummaryProvider<EditTextPreference> { preference ->
+                        preference.text
+                    }
+            }
+            cursor?.close()
+        }
     }
 }

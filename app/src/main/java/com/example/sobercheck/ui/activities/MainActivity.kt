@@ -1,12 +1,8 @@
 package com.example.sobercheck.ui.activities
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.telephony.SmsManager
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -56,18 +52,4 @@ class MainActivity : AppCompatActivity() {
         binding.bottomAppBar.performHide()
     }
 
-    fun makeCall() {
-        val intent = Intent(Intent.ACTION_CALL, Uri.parse("tel:1234567890"))
-        startActivity(intent)
-    }
-
-    fun sendSMS() {
-        val userName = "John"
-        val emergencyContactNo = "1234567890"
-        val messageBody =
-            "Drunk detected!, Please look after $userName to avoid accidents. Sent by Sober Check app"
-        val smsManager: SmsManager = SmsManager.getDefault()
-        smsManager.sendTextMessage(emergencyContactNo, null, messageBody, null, null)
-        Toast.makeText(this, "Message Sent", Toast.LENGTH_LONG).show()
-    }
 }
