@@ -48,7 +48,7 @@ class SelfieFragment : Fragment() {
 
         binding.btnCamera.setOnClickListener {
             takePhoto()
-            val timer = object : CountDownTimer(5000, 1000) {
+            val timer = object : CountDownTimer(3000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
                 override fun onFinish() {
                     findNavController().navigate(R.id.action_selfie_to_walkingExercise)
