@@ -9,10 +9,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
+import androidx.lifecycle.LifecycleOwner
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
+import com.google.common.util.concurrent.ListenableFuture
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -22,7 +27,7 @@ class SelfieFragment : Fragment() {
     private var _binding: FragmentSelfieBinding? = null
     private val binding get() = _binding!!
     private lateinit var cameraPermissionsRequester: PermissionsRequester
-
+    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,12 +36,35 @@ class SelfieFragment : Fragment() {
         _binding = FragmentSelfieBinding.inflate(inflater, container, false)
 
         binding.btnCamera.setOnClickListener {
-            cameraPermissionsRequester.launch()
-            findNavController().navigate(R.id.action_selfie_to_walkingExercise)
+            takeSelfie()
+//            findNavController().navigate(R.id.action_selfie_to_walkingExercise)
         }
+        cameraPermissionsRequester.launch()
+
         return binding.root
     }
 
+    private fun takeSelfie() {
+
+    }
+
+
+    private fun setCameraPreview() {
+        cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+        cameraProviderFuture.addListener({
+            val cameraProvider = cameraProviderFuture.get()
+            bindPreview(cameraProvider)
+        }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun bindPreview(cameraProvider: ProcessCameraProvider) {
+        val preview: Preview = Preview.Builder().build()
+        val cameraSelector: CameraSelector = CameraSelector.Builder()
+            .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
+            .build()
+        preview.setSurfaceProvider(binding.camPreview.surfaceProvider)
+        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
+    }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,14 +73,10 @@ class SelfieFragment : Fragment() {
             onShowRationale = ::onCameraShowRationale,
             onPermissionDenied = ::onCameraDenied,
             onNeverAskAgain = ::onCameraNeverAskAgain,
-            requiresPermission = ::openCamera
+            requiresPermission = ::setCameraPreview
         )
     }
 
-    private fun openCamera() {
-        //  val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).putExtra(MediaStore.EXTRA_OUTPUT, Environment.DIRECTORY_DOWNLOADS + "/temp.png")
-        //  startActivityForResult(intent, 1)
-    }
 
     private fun onCameraNeverAskAgain() {
         Toast.makeText(
