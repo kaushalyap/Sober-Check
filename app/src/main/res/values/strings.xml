@@ -43,5 +43,8 @@
     <string name="message_sent">Message Sent!</string>
     <string name="sms_dialog_body">"A message was already sent to your emergency contact"</string>
     <string name="uber_dialog_body">"An Uber was already dispatched to your location"</string>
+    <string name="permission_write_storage_rationale">Storage write permission is needed to save the photo</string>
+    <string name="permission_write_storage_denied">Write storage permission was denied!</string>
+    <string name="permission_storage_write_never_ask_again">Storage write permission will be never asked again!</string>
 
 </resources>

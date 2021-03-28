@@ -3,6 +3,8 @@ package com.example.sobercheck.ui.fragments
 import android.Manifest
 import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,24 +12,33 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
-import com.google.common.util.concurrent.ListenableFuture
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class SelfieFragment : Fragment() {
 
     private var _binding: FragmentSelfieBinding? = null
     private val binding get() = _binding!!
     private lateinit var cameraPermissionsRequester: PermissionsRequester
-    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+
+    private var imageCapture: ImageCapture? = null
+    private lateinit var outputDirectory: File
+    private lateinit var cameraExecutor: ExecutorService
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,35 +47,102 @@ class SelfieFragment : Fragment() {
         _binding = FragmentSelfieBinding.inflate(inflater, container, false)
 
         binding.btnCamera.setOnClickListener {
-            takeSelfie()
-//            findNavController().navigate(R.id.action_selfie_to_walkingExercise)
+            takePhoto()
+            val timer = object : CountDownTimer(5000, 1000) {
+                override fun onTick(millisUntilFinished: Long) {}
+                override fun onFinish() {
+                    findNavController().navigate(R.id.action_selfie_to_walkingExercise)
+                }
+            }
+            timer.start()
         }
+
+        setOutputDirectory()
+        cameraExecutor = Executors.newSingleThreadExecutor()
+
         cameraPermissionsRequester.launch()
 
         return binding.root
     }
 
-    private fun takeSelfie() {
-
+    private fun setOutputDirectory() {
+        outputDirectory = getOutputDirectory(requireContext())
     }
 
 
-    private fun setCameraPreview() {
-        cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            bindPreview(cameraProvider)
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
+
+        cameraProviderFuture.addListener(Runnable {
+            // Used to bind the lifecycle of cameras to the lifecycle owner
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
+            // Preview
+            val preview = Preview.Builder().build()
+            preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+
+            imageCapture = ImageCapture.Builder().build()
+
+            // Select front camera as a default
+            val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+
+            try {
+                // Unbind use cases before rebinding
+                cameraProvider.unbindAll()
+
+                // Bind use cases to camera
+                cameraProvider.bindToLifecycle(
+                    this, cameraSelector, preview, imageCapture
+                )
+
+            } catch (exc: Exception) {
+                Log.e(TAG, "Use case binding failed", exc)
+            }
+
         }, ContextCompat.getMainExecutor(context))
     }
 
-    private fun bindPreview(cameraProvider: ProcessCameraProvider) {
-        val preview: Preview = Preview.Builder().build()
-        val cameraSelector: CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
-            .build()
-        preview.setSurfaceProvider(binding.camPreview.surfaceProvider)
-        var camera = cameraProvider.bindToLifecycle(this as LifecycleOwner, cameraSelector, preview)
+    private fun takePhoto() {
+        // Get a stable reference of the modifiable image capture use case
+        val imageCapture = imageCapture ?: return
+
+        // Create time-stamped output file to hold the image
+        val photoFile = File(
+            outputDirectory,
+            SimpleDateFormat(
+                FILENAME_FORMAT, Locale.US
+            ).format(System.currentTimeMillis()) + ".jpg"
+        )
+
+        // Create output options object which contains file + metadata
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
+
+        // Set up image capture listener, which is triggered after photo has
+        // been taken
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(context),
+            object : ImageCapture.OnImageSavedCallback {
+                override fun onError(exc: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                }
+
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
+                    val msg = "Selfie taken!"
+                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                }
+            })
     }
+
+    private fun getOutputDirectory(context: Context): File {
+        val appContext = context.applicationContext
+        val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
+            File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
+        }
+        return if (mediaDir != null && mediaDir.exists())
+            mediaDir else appContext.filesDir
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -73,7 +151,7 @@ class SelfieFragment : Fragment() {
             onShowRationale = ::onCameraShowRationale,
             onPermissionDenied = ::onCameraDenied,
             onNeverAskAgain = ::onCameraNeverAskAgain,
-            requiresPermission = ::setCameraPreview
+            requiresPermission = ::startCamera
         )
     }
 
@@ -107,5 +185,11 @@ class SelfieFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        cameraExecutor.shutdown()
+    }
+
+    companion object {
+        private const val TAG = "SELFIE"
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 }
