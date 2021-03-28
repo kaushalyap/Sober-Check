@@ -46,5 +46,8 @@
     <string name="permission_write_storage_rationale">Storage write permission is needed to save the photo</string>
     <string name="permission_write_storage_denied">Write storage permission was denied!</string>
     <string name="permission_storage_write_never_ask_again">Storage write permission will be never asked again!</string>
+    <string name="permission_internet_never_ask_again">Internet permission will be never asked again!</string>
+    <string name="permission_internet_denied">Internet permission was denied!</string>
+    <string name="permission_internet_rationale">Internet permission is required to generate pickup address.</string>
 
 </resources>

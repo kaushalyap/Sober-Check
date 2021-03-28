@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.media.MediaPlayer
@@ -48,6 +49,7 @@ const val CLIENT_ID: String = "Xr5TFJyIAFj074yHrYm2txrXxCDdWA8m"
 
 class DrunkFragment : Fragment() {
 
+
     private lateinit var config: SessionConfiguration
     private lateinit var deeplink: RideRequestDeeplink
     private lateinit var mediaPlayer: MediaPlayer
@@ -63,6 +65,11 @@ class DrunkFragment : Fragment() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var uberPickupLocation: UberLocation
     private lateinit var geocoder: Geocoder
+    private lateinit var address: List<Address>
+    private lateinit var addressLine: String
+    private lateinit var knowName: String
+    private var longitude: Double = 0.0000
+    private var latitude: Double = 0.0000
 
 
     override fun onCreateView(
@@ -144,19 +151,25 @@ class DrunkFragment : Fragment() {
     }
 
     private fun getAddress() {
-        TODO("Not yet implemented")
+        address = geocoder.getFromLocation(latitude, longitude, 1)
+        addressLine = address[0].getAddressLine(0)
+        knowName = address[0].featureName.toString()
     }
 
     private fun onInternetNeverAskAgain() {
-        TODO("Not yet implemented")
+        Toast.makeText(
+            context,
+            R.string.permission_internet_never_ask_again,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun onInternetDenied() {
-        TODO("Not yet implemented")
+        Toast.makeText(context, R.string.permission_internet_denied, Toast.LENGTH_SHORT).show()
     }
 
     private fun onInternetShowRationale(request: PermissionRequest) {
-
+        showRationaleDialog(R.string.permission_internet_rationale, request)
     }
 
     private fun onLocationNeverAskAgain() {
@@ -247,7 +260,7 @@ class DrunkFragment : Fragment() {
 
     private fun automateResponse() {
 
-        val countDownTimer = object : CountDownTimer(5000, 100) {
+        val countDownTimer = object : CountDownTimer(5000, 1000) {
             override fun onTick(millisUntilFinished: Long) {}
 
             override fun onFinish() {
@@ -288,7 +301,6 @@ class DrunkFragment : Fragment() {
             .create().show()
     }
 
-
     internal fun makeAlert() {
         mediaPlayer.isLooping = true
         mediaPlayer.start()
@@ -315,9 +327,8 @@ class DrunkFragment : Fragment() {
     }
 
     private fun setPickupLocation(result: Array<Double>): UberLocation {
-        val address = geocoder.getFromLocation(result[0], result[1], 1)
-        val addressLine = address[0].getAddressLine(0)
-        val knowName = address[0].featureName
+        latitude = result[0]
+        longitude = result[1]
         uberPickupLocation = UberLocation(result[1], result[0], knowName, addressLine)
         return uberPickupLocation
     }
