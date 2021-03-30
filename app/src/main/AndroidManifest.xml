@@ -33,7 +33,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SoberCheck"
         tools:ignore="AllowBackup">
-
+        <meta-data
+            android:name="com.google.mlkit.vision.DEPENDENCIES"
+            android:value="face" />
         <activity
             android:name=".ui.activities.MainActivity"
             android:exported="true"
