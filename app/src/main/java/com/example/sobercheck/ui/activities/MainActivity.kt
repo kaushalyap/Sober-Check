@@ -3,12 +3,15 @@ package com.example.sobercheck.ui.activities
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.ActivityMainBinding
+import permissions.dispatcher.PermissionRequest
 
 class MainActivity : AppCompatActivity() {
 
@@ -52,4 +55,13 @@ class MainActivity : AppCompatActivity() {
         binding.bottomAppBar.performHide()
     }
 
+
+    fun showRationaleDialog(@StringRes messageResId: Int, request: PermissionRequest) {
+        AlertDialog.Builder(this)
+            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
+            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
+            .setCancelable(false)
+            .setMessage(messageResId)
+            .show()
+    }
 }

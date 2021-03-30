@@ -17,7 +17,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
@@ -169,7 +168,7 @@ class DrunkFragment : Fragment() {
     }
 
     private fun onInternetShowRationale(request: PermissionRequest) {
-        showRationaleDialog(R.string.permission_internet_rationale, request)
+        mainActivity.showRationaleDialog(R.string.permission_internet_rationale, request)
     }
 
     private fun onLocationNeverAskAgain() {
@@ -185,7 +184,7 @@ class DrunkFragment : Fragment() {
     }
 
     private fun onLocationShowRationale(request: PermissionRequest) {
-        showRationaleDialog(R.string.permission_location_rationale, request)
+        mainActivity.showRationaleDialog(R.string.permission_location_rationale, request)
     }
 
     internal fun sendSMS() {
@@ -219,7 +218,7 @@ class DrunkFragment : Fragment() {
     }
 
     private fun onSmsShowRationale(request: PermissionRequest) {
-        showRationaleDialog(R.string.permission_call_rationale, request)
+        mainActivity.showRationaleDialog(R.string.permission_call_rationale, request)
     }
 
     private fun onCallNeverAskAgain() {
@@ -235,17 +234,9 @@ class DrunkFragment : Fragment() {
     }
 
     private fun onCallShowRationale(request: PermissionRequest) {
-        showRationaleDialog(R.string.permission_call_rationale, request)
+        mainActivity.showRationaleDialog(R.string.permission_call_rationale, request)
     }
 
-    private fun showRationaleDialog(@StringRes messageResId: Int, request: PermissionRequest) {
-        AlertDialog.Builder(requireContext())
-            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
-            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
-            .setCancelable(false)
-            .setMessage(messageResId)
-            .show()
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
