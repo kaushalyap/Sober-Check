@@ -11,16 +11,14 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
+import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
+import com.example.sobercheck.utils.SelfieAnalyzer
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -73,7 +71,7 @@ class SelfieFragment : Fragment() {
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
-        cameraProviderFuture.addListener(Runnable {
+        cameraProviderFuture.addListener({
             // Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
@@ -82,6 +80,14 @@ class SelfieFragment : Fragment() {
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             imageCapture = ImageCapture.Builder().build()
+
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .build()
+                .also {
+                    it.setAnalyzer(cameraExecutor, SelfieAnalyzer { selfie ->
+                        Log.d(TAG, selfie.toString())
+                    })
+                }
 
             // Select front camera as a default
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
@@ -92,7 +98,7 @@ class SelfieFragment : Fragment() {
 
                 // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture
+                    this, cameraSelector, preview, imageCapture, imageAnalyzer
                 )
 
             } catch (exc: Exception) {
@@ -187,6 +193,7 @@ class SelfieFragment : Fragment() {
         _binding = null
         cameraExecutor.shutdown()
     }
+
 
     companion object {
         private const val TAG = "SELFIE"
