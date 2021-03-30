@@ -30,11 +30,14 @@ class SelfieAnalyzer(param: (Any) -> Int) : ImageAnalysis.Analyzer {
                 .addOnFailureListener { e ->
                     Log.d(TAG, e.toString())
                 }
+                .addOnCompleteListener {
+                    imageProxy.close()
+                    mediaImage.close()
+                }
         }
-        mediaImage?.close()
     }
 
     companion object {
-        const val TAG = "SelfieAnalyzer"
+        const val TAG: String = "SelfieAnalyzer"
     }
 }

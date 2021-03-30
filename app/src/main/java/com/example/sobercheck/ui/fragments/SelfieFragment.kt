@@ -85,7 +85,7 @@ class SelfieFragment : Fragment() {
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, SelfieAnalyzer { selfie ->
-                        Log.d(TAG, selfie.toString())
+                        Log.d(TAG, "Hello there! $selfie")
                     })
                 }
 
