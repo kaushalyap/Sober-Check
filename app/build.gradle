@@ -1,12 +1,17 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+    id 'com.google.gms.google-services'
 }
 
 android {
     buildscript {
         apply plugin: 'kotlin-android-extensions'
         apply plugin: "androidx.navigation.safeargs.kotlin"
+    }
+
+    aaptOptions {
+        noCompress "tflite", "lite"
     }
 
     compileSdkVersion 30

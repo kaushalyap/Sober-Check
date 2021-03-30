@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "514952139089",
+    "project_id": "sober-check",
+    "storage_bucket": "sober-check.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514952139089:android:70e7c15cd441544f1b0370",
+        "android_client_info": {
+          "package_name": "com.example.sobercheck"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "514952139089-n4q0ij39sllo2ncaqthe2r58t5kravqv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCT0N94ZWHB96IUDyHgn2bdkHlaRhaQ8jc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "514952139089-n4q0ij39sllo2ncaqthe2r58t5kravqv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

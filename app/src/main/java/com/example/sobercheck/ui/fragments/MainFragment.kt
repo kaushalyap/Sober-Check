@@ -7,14 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceManager
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentMainBinding
+import com.example.sobercheck.model.MachineLearning
 import com.example.sobercheck.ui.activities.MainActivity
-import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
-import com.google.firebase.ml.modeldownloader.DownloadType
-import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -35,9 +33,7 @@ class MainFragment : Fragment() {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
         mainActivity = activity as MainActivity
         showFabBottomAppBar()
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val address = sharedPreferences.getString(getString(R.string.pref_drop_off_location), "")
-        binding.textView.text = address
+        internetPermissionsRequester.launch()
         return binding.root
     }
 
@@ -56,22 +52,7 @@ class MainFragment : Fragment() {
     }
 
     private fun downloadModel() {
-        val conditions = CustomModelDownloadConditions.Builder()
-            .requireWifi().build()
-        FirebaseModelDownloader.getInstance()
-            .getModel("", DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND, conditions)
-            .addOnSuccessListener { customModel ->
-
-                // Download complete. Depending on your app, you could enable the ML
-                // feature, or switch from the local model to the remote model, etc.
-
-                // The CustomModel object contains the local path of the model file,
-                // which you can use to instantiate a TensorFlow Lite interpreter.
-                Toast.makeText(context, "Model  download complete!", Toast.LENGTH_SHORT).show()
-
-            }
-
-
+        MachineLearning().downloadModels()
     }
 
     override fun onAttach(context: Context) {
@@ -83,7 +64,6 @@ class MainFragment : Fragment() {
             onNeverAskAgain = ::onInternetNeverAskAgain,
             requiresPermission = ::downloadModel
         )
-
     }
 
     private fun onInternetDenied() {
@@ -99,7 +79,11 @@ class MainFragment : Fragment() {
     }
 
     private fun onInternetShowRationale(request: PermissionRequest) {
-        mainActivity.showRationaleDialog(R.string.permission_internet_rationale, request)
-
+        AlertDialog.Builder(requireContext())
+            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
+            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
+            .setCancelable(false)
+            .setMessage("messageResId")
+            .show()
     }
 }
