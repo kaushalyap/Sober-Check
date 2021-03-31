@@ -1,41 +1,49 @@
 package com.example.sobercheck.utils
 
 import android.annotation.SuppressLint
-import android.util.Log
+import android.graphics.Rect
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageProxy
+import com.example.sobercheck.customviews.GraphicOverlay
+import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.face.FaceDetection
-import com.google.mlkit.vision.face.FaceDetectorOptions
 
-class SelfieAnalyzer(param: (Any) -> Int) : ImageAnalysis.Analyzer {
+abstract class SelfieAnalyzer<T> : ImageAnalysis.Analyzer {
+
+    abstract val graphicOverlay: GraphicOverlay
+
     @SuppressLint("UnsafeExperimentalUsageError")
     override fun analyze(imageProxy: ImageProxy) {
+
         val mediaImage = imageProxy.image
-        if (mediaImage != null) {
-            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
-
-            val options = FaceDetectorOptions.Builder()
-                .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL).build()
-
-            val detector = FaceDetection.getClient(options)
-            val result = detector.process(image)
-                .addOnSuccessListener { faces ->
-                    for (face in faces) {
-                        val bounds = face.boundingBox
-
-                        Log.d(TAG, bounds.toString())
-                    }
-                }
-                .addOnFailureListener { e ->
-                    Log.d(TAG, e.toString())
-                }
-                .addOnCompleteListener {
+        mediaImage?.let {
+            detectInImage(InputImage.fromMediaImage(it, imageProxy.imageInfo.rotationDegrees))
+                .addOnSuccessListener { results ->
+                    onSuccess(
+                        results,
+                        graphicOverlay,
+                        it.cropRect
+                    )
                     imageProxy.close()
-                    mediaImage.close()
+                }
+                .addOnFailureListener {
+                    onFailure(it)
+                    imageProxy.close()
                 }
         }
     }
+
+    protected abstract fun detectInImage(image: InputImage): Task<T>
+
+    abstract fun stop()
+
+    protected abstract fun onSuccess(
+        results: T,
+        graphicOverlay: GraphicOverlay,
+        rect: Rect
+    )
+
+    protected abstract fun onFailure(e: Exception)
 
     companion object {
         const val TAG: String = "SelfieAnalyzer"

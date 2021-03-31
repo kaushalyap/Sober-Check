@@ -12,13 +12,14 @@ import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.camera.core.*
+import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
-import com.example.sobercheck.utils.SelfieAnalyzer
+import com.example.sobercheck.utils.facedetection.FaceContourDetectionProcessor
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -43,6 +44,7 @@ class SelfieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSelfieBinding.inflate(inflater, container, false)
+
 
         binding.btnCamera.setOnClickListener {
             takePhoto()
@@ -82,11 +84,13 @@ class SelfieFragment : Fragment() {
             imageCapture = ImageCapture.Builder().build()
 
             val imageAnalyzer = ImageAnalysis.Builder()
+                .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
-                    it.setAnalyzer(cameraExecutor, SelfieAnalyzer { selfie ->
-                        Log.d(TAG, "Hello there! $selfie")
-                    })
+                    it.setAnalyzer(
+                        cameraExecutor,
+                        selectAnalyzer()
+                    )
                 }
 
             // Select front camera as a default
@@ -106,6 +110,10 @@ class SelfieFragment : Fragment() {
             }
 
         }, ContextCompat.getMainExecutor(context))
+    }
+
+    private fun selectAnalyzer(): ImageAnalysis.Analyzer {
+        return FaceContourDetectionProcessor(binding.graphicOverlay)
     }
 
     private fun takePhoto() {
