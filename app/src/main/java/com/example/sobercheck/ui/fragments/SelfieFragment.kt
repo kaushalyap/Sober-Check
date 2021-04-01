@@ -1,6 +1,7 @@
 package com.example.sobercheck.ui.fragments
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -19,7 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
-import com.example.sobercheck.utils.facedetection.FaceContourDetectionProcessor
+import com.example.sobercheck.utils.FaceContourDetectionProcessor
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -29,12 +30,12 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+
 class SelfieFragment : Fragment() {
 
     private var _binding: FragmentSelfieBinding? = null
     private val binding get() = _binding!!
     private lateinit var cameraPermissionsRequester: PermissionsRequester
-
     private var imageCapture: ImageCapture? = null
     private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
@@ -44,7 +45,6 @@ class SelfieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSelfieBinding.inflate(inflater, container, false)
-
 
         binding.btnCamera.setOnClickListener {
             takePhoto()
@@ -57,7 +57,7 @@ class SelfieFragment : Fragment() {
             timer.start()
         }
 
-        setOutputDirectory()
+        setOutputFile()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         cameraPermissionsRequester.launch()
@@ -65,24 +65,20 @@ class SelfieFragment : Fragment() {
         return binding.root
     }
 
-    private fun setOutputDirectory() {
-        outputDirectory = getOutputDirectory(requireContext())
+    private fun setOutputFile() {
+        outputDirectory = getOutputFile(requireContext())
     }
 
 
+    @SuppressLint("LogConditional")
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-            // Preview
             val preview = Preview.Builder().build()
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-
             imageCapture = ImageCapture.Builder().build()
-
             val imageAnalyzer = ImageAnalysis.Builder()
                 .setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -92,25 +88,18 @@ class SelfieFragment : Fragment() {
                         selectAnalyzer()
                     )
                 }
-
-            // Select front camera as a default
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
-
             try {
-                // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-
-                // Bind use cases to camera
                 cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture, imageAnalyzer
                 )
-
             } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
-
         }, ContextCompat.getMainExecutor(context))
     }
+
 
     private fun selectAnalyzer(): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(binding.graphicOverlay)
@@ -120,7 +109,6 @@ class SelfieFragment : Fragment() {
         // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
 
-        // Create time-stamped output file to hold the image
         val photoFile = File(
             outputDirectory,
             SimpleDateFormat(
@@ -128,11 +116,8 @@ class SelfieFragment : Fragment() {
             ).format(System.currentTimeMillis()) + ".jpg"
         )
 
-        // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
-        // Set up image capture listener, which is triggered after photo has
-        // been taken
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(context),
@@ -148,7 +133,7 @@ class SelfieFragment : Fragment() {
             })
     }
 
-    private fun getOutputDirectory(context: Context): File {
+    private fun getOutputFile(context: Context): File {
         val appContext = context.applicationContext
         val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
             File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
@@ -156,7 +141,6 @@ class SelfieFragment : Fragment() {
         return if (mediaDir != null && mediaDir.exists())
             mediaDir else appContext.filesDir
     }
-
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -168,7 +152,6 @@ class SelfieFragment : Fragment() {
             requiresPermission = ::startCamera
         )
     }
-
 
     private fun onCameraNeverAskAgain() {
         Toast.makeText(
@@ -201,7 +184,6 @@ class SelfieFragment : Fragment() {
         _binding = null
         cameraExecutor.shutdown()
     }
-
 
     companion object {
         private const val TAG = "SELFIE"

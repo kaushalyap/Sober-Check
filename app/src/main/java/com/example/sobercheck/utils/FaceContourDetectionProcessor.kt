@@ -1,15 +1,16 @@
-package com.example.sobercheck.utils.facedetection
+package com.example.sobercheck.utils
 
 import android.graphics.Rect
 import android.util.Log
+import com.example.sobercheck.customviews.FaceContourGraphic
 import com.example.sobercheck.customviews.GraphicOverlay
-import com.example.sobercheck.utils.SelfieAnalyzer
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetectorOptions
 import java.io.IOException
+
 
 class FaceContourDetectionProcessor(private val view: GraphicOverlay) :
     SelfieAnalyzer<List<Face>>() {
@@ -42,8 +43,8 @@ class FaceContourDetectionProcessor(private val view: GraphicOverlay) :
         rect: Rect
     ) {
         graphicOverlay.clear()
-        results.forEach {
-            val faceGraphic = FaceContourGraphic(graphicOverlay, it, rect)
+        results.forEach { face ->
+            val faceGraphic = FaceContourGraphic(graphicOverlay, face, rect)
             graphicOverlay.add(faceGraphic)
         }
         graphicOverlay.postInvalidate()
@@ -54,7 +55,6 @@ class FaceContourDetectionProcessor(private val view: GraphicOverlay) :
     }
 
     companion object {
-        private const val TAG = "FaceDetectorProcessor"
+        private const val TAG = "FaceDetectionProcessor"
     }
-
 }

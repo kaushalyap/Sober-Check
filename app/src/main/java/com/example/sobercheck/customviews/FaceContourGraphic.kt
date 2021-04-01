@@ -1,10 +1,9 @@
-package com.example.sobercheck.utils.facedetection
+package com.example.sobercheck.customviews
 
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
-import com.example.sobercheck.customviews.GraphicOverlay
 import com.google.mlkit.vision.face.Face
 
 class FaceContourGraphic(

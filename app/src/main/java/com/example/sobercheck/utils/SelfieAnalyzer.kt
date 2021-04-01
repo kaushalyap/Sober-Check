@@ -8,6 +8,7 @@ import com.example.sobercheck.customviews.GraphicOverlay
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 
+
 abstract class SelfieAnalyzer<T> : ImageAnalysis.Analyzer {
 
     abstract val graphicOverlay: GraphicOverlay
@@ -16,18 +17,19 @@ abstract class SelfieAnalyzer<T> : ImageAnalysis.Analyzer {
     override fun analyze(imageProxy: ImageProxy) {
 
         val mediaImage = imageProxy.image
-        mediaImage?.let {
-            detectInImage(InputImage.fromMediaImage(it, imageProxy.imageInfo.rotationDegrees))
+        mediaImage?.let { image ->
+            detectInImage(InputImage.fromMediaImage(image, imageProxy.imageInfo.rotationDegrees))
                 .addOnSuccessListener { results ->
                     onSuccess(
                         results,
                         graphicOverlay,
-                        it.cropRect
+                        image.cropRect,
                     )
-                    imageProxy.close()
                 }
                 .addOnFailureListener {
                     onFailure(it)
+                }
+                .addOnCompleteListener {
                     imageProxy.close()
                 }
         }
