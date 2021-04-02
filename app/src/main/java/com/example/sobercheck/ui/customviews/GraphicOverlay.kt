@@ -1,4 +1,4 @@
-package com.example.sobercheck.customviews
+package com.example.sobercheck.ui.customviews
 
 import android.content.Context
 import android.content.res.Configuration
@@ -26,7 +26,6 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
 
         fun calculateRect(height: Float, width: Float, boundingBoxT: Rect): RectF {
 
-            // for land scape
             fun isLandScapeMode(): Boolean {
                 return overlay.context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
             }
@@ -108,4 +107,7 @@ open class GraphicOverlay(context: Context?, attrs: AttributeSet?) :
         }
     }
 
+    companion object {
+        private const val TAG = "GraphicOverlay"
+    }
 }

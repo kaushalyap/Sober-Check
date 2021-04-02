@@ -48,6 +48,7 @@
     <string name="permission_storage_write_never_ask_again">Storage write permission will be never asked again!</string>
     <string name="permission_internet_never_ask_again">Internet permission will be never asked again!</string>
     <string name="permission_internet_denied">Internet permission was denied!</string>
-    <string name="permission_internet_rationale">Internet permission is required to generate pickup address.</string>
+    <string name="permission_internet_address_rationale">Internet permission is required to generate pickup address.</string>
+    <string name="permission_internet_model_download_rationale">Internet permission is required to download machine learning model for the first time.</string>
 
 </resources>

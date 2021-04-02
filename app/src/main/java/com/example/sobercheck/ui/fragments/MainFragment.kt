@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentMainBinding
@@ -25,34 +24,25 @@ class MainFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var mainActivity: MainActivity
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMainBinding.inflate(inflater, container, false)
-        mainActivity = activity as MainActivity
-        showFabBottomAppBar()
-        internetPermissionsRequester.launch()
+        init()
         return binding.root
     }
 
-    private fun showFabBottomAppBar() {
+    private fun init() {
+        mainActivity = activity as MainActivity
         mainActivity.showFabBottomAppBar()
-    }
-
-    private fun hideFabBottomAppBar() {
-        mainActivity.hideFabBottomAppBar()
+        internetPermissionsRequester.launch()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        hideFabBottomAppBar()
-    }
-
-    private fun downloadModel() {
-        MachineLearning().downloadModels()
+        mainActivity.hideFabBottomAppBar()
     }
 
     override fun onAttach(context: Context) {
@@ -64,6 +54,10 @@ class MainFragment : Fragment() {
             onNeverAskAgain = ::onInternetNeverAskAgain,
             requiresPermission = ::downloadModel
         )
+    }
+
+    private fun downloadModel() {
+        MachineLearning().downloadModels()
     }
 
     private fun onInternetDenied() {
@@ -79,11 +73,9 @@ class MainFragment : Fragment() {
     }
 
     private fun onInternetShowRationale(request: PermissionRequest) {
-        AlertDialog.Builder(requireContext())
-            .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
-            .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }
-            .setCancelable(false)
-            .setMessage("messageResId")
-            .show()
+        mainActivity.showPermissionRationaleDialog(
+            R.string.permission_internet_model_download_rationale,
+            request
+        )
     }
 }

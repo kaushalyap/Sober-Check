@@ -20,16 +20,22 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        init()
+    }
+
+    private fun init() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        navController = findNavController(R.id.nav_host_fragment)
-        binding.bottomAppBar.setupWithNavController(navController)
-        setSupportActionBar(binding.bottomAppBar)
-
+        initNavigation()
         binding.fabCheck.setOnClickListener {
             navController.navigate(R.id.action_main_to_selfie)
         }
+    }
+
+    private fun initNavigation() {
+        navController = findNavController(R.id.nav_host_fragment)
+        binding.bottomAppBar.setupWithNavController(navController)
+        setSupportActionBar(binding.bottomAppBar)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -45,18 +51,20 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    fun showFabBottomAppBar() {
+    internal fun showFabBottomAppBar() {
         binding.fabCheck.show()
         binding.bottomAppBar.performShow()
     }
 
-    fun hideFabBottomAppBar() {
+    internal fun hideFabBottomAppBar() {
         binding.fabCheck.hide()
         binding.bottomAppBar.performHide()
     }
 
-
-    fun showRationaleDialog(@StringRes messageResId: Int, request: PermissionRequest) {
+    internal fun showPermissionRationaleDialog(
+        @StringRes messageResId: Int,
+        request: PermissionRequest
+    ) {
         AlertDialog.Builder(this)
             .setPositiveButton(R.string.allow) { _, _ -> request.proceed() }
             .setNegativeButton(R.string.deny) { _, _ -> request.cancel() }

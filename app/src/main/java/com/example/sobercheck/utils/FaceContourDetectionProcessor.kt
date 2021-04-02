@@ -2,8 +2,8 @@ package com.example.sobercheck.utils
 
 import android.graphics.Rect
 import android.util.Log
-import com.example.sobercheck.customviews.FaceContourGraphic
-import com.example.sobercheck.customviews.GraphicOverlay
+import com.example.sobercheck.ui.customviews.FaceContourGraphic
+import com.example.sobercheck.ui.customviews.GraphicOverlay
 import com.google.android.gms.tasks.Task
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.Face

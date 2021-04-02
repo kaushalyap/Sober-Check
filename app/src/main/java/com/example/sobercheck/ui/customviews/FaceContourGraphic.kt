@@ -1,4 +1,4 @@
-package com.example.sobercheck.customviews
+package com.example.sobercheck.ui.customviews
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -42,6 +42,7 @@ class FaceContourGraphic(
 
     companion object {
         private const val BOX_STROKE_WIDTH = 5.0f
+        private const val TAG = "FaceContourGraphic"
     }
 
 }

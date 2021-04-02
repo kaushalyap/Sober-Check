@@ -11,7 +11,6 @@ import androidx.preference.PreferenceFragmentCompat
 import com.example.sobercheck.R
 
 
-const val CONTACT_PICKER_RESULT: Int = 1
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
@@ -19,7 +18,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var prefDropOffLocation: EditTextPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-
         setPreferencesFromResource(R.xml.preferences, rootKey)
         setupPreferenceListeners()
     }
@@ -40,7 +38,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
             Preference.SummaryProvider<EditTextPreference> { preference ->
                 preference.text
             }
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -74,5 +71,10 @@ class SettingsFragment : PreferenceFragmentCompat() {
             }
             cursor?.close()
         }
+    }
+
+    companion object {
+        const val TAG: String = "SettingsFragment"
+        const val CONTACT_PICKER_RESULT: Int = 1
     }
 }
