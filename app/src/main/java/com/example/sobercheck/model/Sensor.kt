@@ -21,7 +21,7 @@ class Sensor : SensorEventListener {
         )
     }
 
-    private fun isUserStill(activity: Activity) {
+    private fun isUserStill() {
 
     }
 

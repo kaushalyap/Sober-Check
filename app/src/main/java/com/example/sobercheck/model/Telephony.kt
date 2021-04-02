@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.telephony.SmsManager
-import android.widget.Toast
+import android.util.Log
 import androidx.preference.PreferenceManager
 import com.example.sobercheck.R
 
@@ -23,21 +23,18 @@ class Telephony {
         val emergencyContactNo = getEmergencyContact(context)
         val smsManager: SmsManager = SmsManager.getDefault()
         smsManager.sendTextMessage(emergencyContactNo, null, MESSAGE_BODY, null, null)
-        Toast.makeText(
-            context,
-            context.resources.getString(R.string.message_sent),
-            Toast.LENGTH_LONG
-        ).show()
-    }
-
-    companion object {
-        const val MESSAGE_BODY: String =
-            "Drunk detected!, Please look after the sender to avoid accidents. Sent by Sober Check app"
+        Log.d(TAG, "SMS sent!")
     }
 
     private fun getEmergencyContact(context: Context): String {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
         return sharedPreferences.getString(context.getString(R.string.pref_emergency_contact), "")
             .toString()
+    }
+
+    companion object {
+        const val TAG: String = "Telephony"
+        const val MESSAGE_BODY: String =
+            "Drunk detected!, Please look after the sender to avoid accidents. Sent by Sober Check app"
     }
 }

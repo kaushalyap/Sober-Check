@@ -23,13 +23,25 @@ class UberService {
     private lateinit var addressLine: String
     private var config: SessionConfiguration = SessionConfiguration.Builder().setClientId(CLIENT_ID)
         .setScopes(listOf(Scope.PROFILE, Scope.RIDE_WIDGETS)).build()
-    private lateinit var uberPickupLocation: UberLocation
+    private var uberPickupLocation: UberLocation
     private lateinit var uberDropOffLocation: UberLocation
     private var longitude: Double = 0.0000
     private var latitude: Double = 0.0000
 
     init {
         UberSdk.initialize(config)
+        uberPickupLocation = UberLocation(null, null, null, null)
+    }
+
+    private fun setDropOffLocation(context: Context) {
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+        val dropOffLocation =
+            sharedPreferences.getBoolean(
+                context.resources.getString(R.string.pref_drop_off_location),
+                false
+            )
+                .toString()
+        uberDropOffLocation = UberLocation(null, null, null, dropOffLocation)
     }
 
     @SuppressLint("MissingPermission")
@@ -67,20 +79,12 @@ class UberService {
 
 
     fun getUberDeepLink(context: Context): RideRequestDeeplink {
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val dropOffLocation =
-            sharedPreferences.getBoolean(
-                context.resources.getString(R.string.pref_drop_off_location),
-                false
-            )
-                .toString()
-        uberDropOffLocation = UberLocation(null, null, null, dropOffLocation)
-
         return RideRequestDeeplink.Builder(context).setSessionConfiguration(config)
-            .setRideParameters(getRideParameters()).build()
+            .setRideParameters(getRideParameters(context)).build()
     }
 
-    fun getRideParameters(): RideParameters {
+    fun getRideParameters(context: Context): RideParameters {
+        setDropOffLocation(context)
         return RideParameters.Builder()
             .setPickupLocation(
                 uberPickupLocation.latitude,
@@ -99,6 +103,6 @@ class UberService {
 
     companion object {
         // Take Client ID from https://developer.uber.com/dashboard/
-        const val CLIENT_ID: String = "UBER-CLIENT-ID"
+        const val CLIENT_ID: String = "Xr5TFJyIAFj074yHrYm2txrXxCDdWA8m"
     }
 }

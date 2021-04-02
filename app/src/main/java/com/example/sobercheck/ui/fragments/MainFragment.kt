@@ -39,12 +39,6 @@ class MainFragment : Fragment() {
         internetPermissionsRequester.launch()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-        mainActivity.hideFabBottomAppBar()
-    }
-
     override fun onAttach(context: Context) {
         super.onAttach(context)
         internetPermissionsRequester = constructPermissionsRequest(
@@ -77,5 +71,11 @@ class MainFragment : Fragment() {
             R.string.permission_internet_model_download_rationale,
             request
         )
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+        mainActivity.hideFabBottomAppBar()
     }
 }

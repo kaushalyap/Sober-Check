@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +25,7 @@ import permissions.dispatcher.ktx.constructPermissionsRequest
 
 class DrunkFragment : Fragment() {
 
+    private lateinit var responded: BooleanArray
     private lateinit var mediaPlayer: MediaPlayer
     private var _binding: FragmentDrunkBinding? = null
     private val binding get() = _binding!!
@@ -40,27 +42,36 @@ class DrunkFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentDrunkBinding.inflate(inflater, container, false)
-        initialSetup()
+        init()
         return binding.root
     }
 
-    private fun initialSetup() {
+    private fun init() {
         mainActivity = activity as MainActivity
         mediaPlayer = MediaPlayer.create(context, R.raw.drunk_warning)
         setButtonClickListeners()
         uberService = UberService()
         telephony = Telephony()
-        val responded =
-            AutomatedResponse().respond(requireActivity(), requireContext(), mediaPlayer)
-        when {
-            responded[1] -> {
-                binding.btnSms.visibility = View.GONE
-                Toast.makeText(context, "Message Sent!", Toast.LENGTH_SHORT).show()
-            }
-            responded[2] -> binding.btnCall.visibility = View.GONE
-            else -> binding.btnRideRequest.visibility = View.GONE
-        }
+        automatedRespond()
     }
+
+    private fun automatedRespond() {
+        val automatedResponse = AutomatedResponse()
+        AutomatedResponse().respond(requireActivity(), requireContext(), mediaPlayer)
+        responded = automatedResponse.responded
+
+        @Suppress("CascadeIf")
+        if (responded[1]) {
+            binding.btnSms.visibility = View.GONE
+            Toast.makeText(context, "Message Sent!", Toast.LENGTH_SHORT).show()
+        } else if (responded[2]) {
+            binding.btnCall.visibility = View.GONE
+        } else if (responded[3]) {
+            binding.btnRideRequest.visibility = View.GONE
+        } else
+            Log.d(TAG, "Alert ON")
+    }
+
 
     private fun setButtonClickListeners() {
         binding.btnCall.setOnClickListener {
@@ -79,8 +90,12 @@ class DrunkFragment : Fragment() {
         uberService.getCurrentLocation(requireContext())
     }
 
+    private fun getAddress() {
+        uberService.setAddress(requireContext())
+    }
+
     private fun orderAnUber() {
-        binding.btnRideRequest.setRideParameters(uberService.getRideParameters())
+        binding.btnRideRequest.setRideParameters(uberService.getRideParameters(requireContext()))
         uberService.getUberDeepLink(requireContext()).execute()
     }
 
@@ -90,10 +105,6 @@ class DrunkFragment : Fragment() {
 
     private fun makeCall() {
         telephony.makeCall(requireActivity())
-    }
-
-    private fun getAddress() {
-        uberService.setAddress(requireContext())
     }
 
     override fun onAttach(context: Context) {
@@ -207,5 +218,9 @@ class DrunkFragment : Fragment() {
     override fun onPause() {
         super.onPause()
         mediaPlayer.stop()
+    }
+
+    companion object {
+        const val TAG: String = "DrunkFragment"
     }
 }

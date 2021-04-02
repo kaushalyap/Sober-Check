@@ -9,7 +9,7 @@
         android:id="@+id/mainFragment"
         android:name="com.example.sobercheck.ui.fragments.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_main_to_selfie"
             app:destination="@id/selfieFragment" />
@@ -27,10 +27,19 @@
         android:name="com.example.sobercheck.ui.fragments.SelfieFragment"
         android:label="fragment_selfie"
         tools:layout="@layout/fragment_selfie">
+        <argument
+            android:name="isDrunkFromSelfie"
+            android:defaultValue="false"
+            app:argType="boolean" />
         <action
             android:id="@+id/action_selfie_to_walkingExercise"
             app:destination="@id/walkingExerciseFragment"
-            app:popUpTo="@id/mainFragment" />
+            app:popUpTo="@id/mainFragment">
+            <argument
+                android:name="isDrunkFromSelfie"
+                android:defaultValue="false"
+                app:argType="boolean" />
+        </action>
     </fragment>
     <fragment
         android:id="@+id/walkingExerciseFragment"

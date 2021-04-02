@@ -1,8 +1,9 @@
 package com.example.sobercheck.ui.fragments
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -20,13 +21,12 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
+import com.example.sobercheck.model.MachineLearning
 import com.example.sobercheck.utils.FaceContourDetectionProcessor
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
-import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
+import java.nio.ByteBuffer
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -37,8 +37,8 @@ class SelfieFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var cameraPermissionsRequester: PermissionsRequester
     private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var selfie: Bitmap
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,13 +51,14 @@ class SelfieFragment : Fragment() {
             val timer = object : CountDownTimer(3000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
                 override fun onFinish() {
-                    findNavController().navigate(R.id.action_selfie_to_walkingExercise)
+                    val drunkFromSelfie = MachineLearning().predictFromSelfie(selfie)
+                    val action =
+                        SelfieFragmentDirections.actionSelfieToWalkingExercise(drunkFromSelfie)
+                    findNavController().navigate(action)
                 }
             }
             timer.start()
         }
-
-        setOutputFile()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         cameraPermissionsRequester.launch()
@@ -65,12 +66,6 @@ class SelfieFragment : Fragment() {
         return binding.root
     }
 
-    private fun setOutputFile() {
-        outputDirectory = getOutputFile(requireContext())
-    }
-
-
-    @SuppressLint("LogConditional")
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
@@ -106,40 +101,23 @@ class SelfieFragment : Fragment() {
     }
 
     private fun takePhoto() {
-        // Get a stable reference of the modifiable image capture use case
         val imageCapture = imageCapture ?: return
-
-        val photoFile = File(
-            outputDirectory,
-            SimpleDateFormat(
-                FILENAME_FORMAT, Locale.US
-            ).format(System.currentTimeMillis()) + ".jpg"
-        )
-
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
-
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(context),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                }
-
-                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val msg = "Selfie taken!"
-                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                }
-            })
+        imageCapture.takePicture(cameraExecutor, object :
+            ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                super.onCaptureSuccess(image)
+                selfie = imageProxyToBitmap(image)
+                Toast.makeText(context, "Selfie taken!", Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
-    private fun getOutputFile(context: Context): File {
-        val appContext = context.applicationContext
-        val mediaDir = context.externalMediaDirs.firstOrNull()?.let {
-            File(it, appContext.resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-        return if (mediaDir != null && mediaDir.exists())
-            mediaDir else appContext.filesDir
+    internal fun imageProxyToBitmap(image: ImageProxy): Bitmap {
+        val planeProxy = image.planes[0]
+        val buffer: ByteBuffer = planeProxy.buffer
+        val bytes = ByteArray(buffer.remaining())
+        buffer.get(bytes)
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     }
 
     override fun onAttach(context: Context) {
@@ -179,6 +157,7 @@ class SelfieFragment : Fragment() {
             .show()
     }
 
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
@@ -187,6 +166,5 @@ class SelfieFragment : Fragment() {
 
     companion object {
         private const val TAG = "SELFIE"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 }

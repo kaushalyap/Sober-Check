@@ -6,14 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentWalkingExerciseBinding
+import com.example.sobercheck.model.MachineLearning
 import com.example.sobercheck.model.Sensor
 
 class WalkingExerciseFragment : Fragment() {
 
     private var _binding: FragmentWalkingExerciseBinding? = null
     private val binding get() = _binding!!
+    private val args: SelfieFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -27,7 +30,12 @@ class WalkingExerciseFragment : Fragment() {
     private fun init() {
         Sensor().initSensorManager(requireActivity())
         binding.btnDone.setOnClickListener {
-            findNavController().navigate(R.id.action_walkingExercise_to_drunk)
+            val isDrunkFromSelfie = args.isDrunkFromSelfie
+            if (MachineLearning().predictFromAccelerometer() && isDrunkFromSelfie) {
+                findNavController().navigate(R.id.action_walkingExercise_to_drunk)
+            } else {
+                findNavController().navigate(R.id.action_walkingExercise_to_sober)
+            }
         }
     }
 
