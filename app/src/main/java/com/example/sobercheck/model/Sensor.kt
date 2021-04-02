@@ -10,7 +10,7 @@ import android.util.Log
 
 
 class Sensor : SensorEventListener {
-    private val movement: ArrayList<AccelerationPoint> = ArrayList()
+    internal val movement: ArrayList<AccelerationPoint> = ArrayList()
 
     fun initSensorManager(activity: Activity) {
         val sensorManager = activity.getSystemService(Context.SENSOR_SERVICE) as SensorManager

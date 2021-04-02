@@ -14,6 +14,7 @@ import com.example.sobercheck.model.Sensor
 
 class WalkingExerciseFragment : Fragment() {
 
+    private lateinit var sensor: Sensor
     private var _binding: FragmentWalkingExerciseBinding? = null
     private val binding get() = _binding!!
     private val args: SelfieFragmentArgs by navArgs()
@@ -28,10 +29,11 @@ class WalkingExerciseFragment : Fragment() {
     }
 
     private fun init() {
-        Sensor().initSensorManager(requireActivity())
+        sensor = Sensor()
+        sensor.initSensorManager(requireActivity())
         binding.btnDone.setOnClickListener {
             val isDrunkFromSelfie = args.isDrunkFromSelfie
-            if (MachineLearning().predictFromAccelerometer() && isDrunkFromSelfie) {
+            if (MachineLearning().predictFromAccelerometer(sensor.movement) && isDrunkFromSelfie) {
                 findNavController().navigate(R.id.action_walkingExercise_to_drunk)
             } else {
                 findNavController().navigate(R.id.action_walkingExercise_to_sober)
