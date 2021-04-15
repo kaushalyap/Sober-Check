@@ -10,8 +10,7 @@
             app:summary="Play audio alert"
             app:title="Audio alert" />
 
-        <EditTextPreference
-            app:defaultValue="911"
+        <Preference
             app:icon="@drawable/ic_contact_24"
             app:key="@string/pref_emergency_contact"
             app:summary="Who to contact when drunk"

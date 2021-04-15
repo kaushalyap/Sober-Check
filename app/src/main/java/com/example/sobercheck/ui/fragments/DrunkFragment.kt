@@ -33,7 +33,6 @@ class DrunkFragment : Fragment() {
     private lateinit var callPermissionsRequester: PermissionsRequester
     private lateinit var smsPermissionsRequester: PermissionsRequester
     private lateinit var locationPermissionsRequester: PermissionsRequester
-    private lateinit var internetPermissionsRequester: PermissionsRequester
     private lateinit var uberService: UberService
     private lateinit var telephony: Telephony
 
@@ -90,10 +89,6 @@ class DrunkFragment : Fragment() {
         uberService.getCurrentLocation(requireContext())
     }
 
-    private fun getAddress() {
-        uberService.setAddress(requireContext())
-    }
-
     private fun orderAnUber() {
         binding.btnRideRequest.setRideParameters(uberService.getRideParameters(requireContext()))
         uberService.getUberDeepLink(requireContext()).execute()
@@ -125,14 +120,6 @@ class DrunkFragment : Fragment() {
             requiresPermission = ::sendSMS
         )
 
-        internetPermissionsRequester = constructPermissionsRequest(
-            Manifest.permission.INTERNET,
-            onShowRationale = ::onInternetShowRationale,
-            onPermissionDenied = ::onInternetDenied,
-            onNeverAskAgain = ::onInternetNeverAskAgain,
-            requiresPermission = ::getAddress
-        )
-
         locationPermissionsRequester = constructLocationPermissionRequest(
             LocationPermission.FINE,
             onShowRationale = ::onLocationShowRationale,
@@ -142,24 +129,6 @@ class DrunkFragment : Fragment() {
         )
     }
 
-    private fun onInternetNeverAskAgain() {
-        Toast.makeText(
-            context,
-            R.string.permission_internet_never_ask_again,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun onInternetDenied() {
-        Toast.makeText(context, R.string.permission_internet_denied, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onInternetShowRationale(request: PermissionRequest) {
-        mainActivity.showPermissionRationaleDialog(
-            R.string.permission_internet_address_rationale,
-            request
-        )
-    }
 
     private fun onLocationNeverAskAgain() {
         Toast.makeText(

@@ -93,15 +93,15 @@ class MachineLearning {
         modelOutput.rewind()
         val results = modelOutput.asFloatBuffer()
 
-        for (i in results.capacity()) {
-            label = labels[i]
-            probability = results.get(i)
-
-            if (probability > highestProbability) {
-                highestProbability = probability
-                newLabel = label
-            }
-        }
+//        for (i in results.capacity()) {
+//            label = labels[i]
+//            probability = results.get(i)
+//
+//            if (probability > highestProbability) {
+//                highestProbability = probability
+//                newLabel = label
+//            }
+//        }
         return newLabel != "sober"
     }
 
@@ -133,15 +133,15 @@ class MachineLearning {
         modelOutput.rewind()
         val results = modelOutput.asFloatBuffer()
 
-        for (i in results.capacity()) {
-            label = labels[i]
-            probability = results.get(i)
-
-            if (probability > highestProbability) {
-                highestProbability = probability
-                newLabel = label
-            }
-        }
+//        for (i in results.capacity()) {
+//            label = labels[i]
+//            probability = results.get(i)
+//
+//            if (probability > highestProbability) {
+//                highestProbability = probability
+//                newLabel = label
+//            }
+//        }
         return newLabel != "sober"
     }
 

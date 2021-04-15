@@ -24,11 +24,10 @@ import permissions.dispatcher.ktx.constructPermissionsRequest
 class SettingsFragment : PreferenceFragmentCompat() {
 
     private lateinit var mainActivity: MainActivity
-    private lateinit var prefEmergencyContact: EditTextPreference
+    private lateinit var prefEmergencyContact: Preference
     private lateinit var callPermissionsRequester: PermissionsRequester
     private lateinit var smsPermissionsRequester: PermissionsRequester
     private lateinit var locationPermissionsRequester: PermissionsRequester
-    private lateinit var internetPermissionsRequester: PermissionsRequester
 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -39,7 +38,27 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun init() {
         setupPreferenceListeners()
         mainActivity = activity as MainActivity
+        setEmergencyContactSummary()
     }
+
+    private fun setEmergencyContactSummary() {
+        val sharedPreferences = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
+        val savedNumber =
+            sharedPreferences.getString(context?.getString(R.string.pref_emergency_contact), "")
+                .toString()
+
+        prefEmergencyContact =
+            (findPreference(getString(R.string.pref_emergency_contact)) ?: return)
+
+        prefEmergencyContact.summaryProvider =
+            Preference.SummaryProvider<Preference> {
+                if (savedNumber == "")
+                    "Who to contact when drunk"
+                else
+                    savedNumber
+            }
+    }
+
 
     private fun setupPreferenceListeners() {
 
@@ -76,12 +95,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
                         if (prefs.getBoolean(getString(R.string.pref_call), false))
                             callPermissionsRequester.launch()
                     }
-                    key.equals(getString(R.string.pref_uber)) -> {
-                        if (prefs.getBoolean(getString(R.string.pref_uber), false)) {
-                            internetPermissionsRequester.launch()
-                            locationPermissionsRequester.launch()
-                        }
-                    }
                 }
             }
         preferences.registerOnSharedPreferenceChangeListener(listener)
@@ -103,18 +116,15 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 val numberIndex =
                     cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
                 val number = cursor.getString(numberIndex)
-
                 val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE) ?: return
                 with(sharedPref.edit()) {
                     putString(getString(R.string.pref_emergency_contact), number)
                     apply()
                 }
 
-                prefEmergencyContact =
-                    (findPreference(getString(R.string.pref_emergency_contact)) ?: return)
                 prefEmergencyContact.summaryProvider =
-                    Preference.SummaryProvider<EditTextPreference> { preference ->
-                        preference.text
+                    Preference.SummaryProvider<Preference> {
+                        number
                     }
             }
             cursor?.close()
@@ -124,7 +134,6 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private fun sendSMS() {}
     private fun makeCall() {}
     private fun getCurrentLocation() {}
-    private fun getAddress() {}
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -143,38 +152,13 @@ class SettingsFragment : PreferenceFragmentCompat() {
             onNeverAskAgain = ::onSmsNeverAskAgain,
             requiresPermission = ::sendSMS
         )
-        internetPermissionsRequester = constructPermissionsRequest(
-            Manifest.permission.INTERNET,
-            onShowRationale = ::onInternetShowRationale,
-            onPermissionDenied = ::onInternetDenied,
-            onNeverAskAgain = ::onInternetNeverAskAgain,
-            requiresPermission = ::getAddress
-        )
+
         locationPermissionsRequester = constructLocationPermissionRequest(
             LocationPermission.FINE,
             onShowRationale = ::onLocationShowRationale,
             onPermissionDenied = ::onLocationDenied,
             onNeverAskAgain = ::onLocationNeverAskAgain,
             requiresPermission = ::getCurrentLocation
-        )
-    }
-
-    private fun onInternetNeverAskAgain() {
-        Toast.makeText(
-            context,
-            R.string.permission_internet_never_ask_again,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun onInternetDenied() {
-        Toast.makeText(context, R.string.permission_internet_denied, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onInternetShowRationale(request: PermissionRequest) {
-        mainActivity.showPermissionRationaleDialog(
-            R.string.permission_internet_address_rationale,
-            request
         )
     }
 
