@@ -5,7 +5,6 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -24,6 +23,7 @@ import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
 import com.example.sobercheck.model.MachineLearning
 import com.example.sobercheck.utils.FaceContourDetectionProcessor
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
@@ -47,29 +47,23 @@ class SelfieFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentSelfieBinding.inflate(inflater, container, false)
+        init()
+        return binding.root
+    }
 
+    private fun init() {
         binding.btnCamera.setOnClickListener {
-            takePhoto()
-            val timer = object : CountDownTimer(3000, 1000) {
-                override fun onTick(millisUntilFinished: Long) {}
-                override fun onFinish() {
-
-                    lifecycleScope.launch {
-                        val prediction = MachineLearning().predictFromSelfie(selfie)
-
-                        val action =
-                            SelfieFragmentDirections.actionSelfieToWalkingExercise(prediction)
-
-                        findNavController().navigate(action)
-                    }
-                }
+            lifecycleScope.launch {
+                takePhoto()
+                val prediction = MachineLearning().predictFromSelfie(selfie)
+                val action =
+                    SelfieFragmentDirections.actionSelfieToWalkingExercise(prediction)
+                findNavController().navigate(action)
             }
-            timer.start()
         }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
         cameraPermissionsRequester.launch()
-        return binding.root
     }
 
     private fun startCamera() {
@@ -101,21 +95,23 @@ class SelfieFragment : Fragment() {
         }, ContextCompat.getMainExecutor(context))
     }
 
-
     private fun selectAnalyzer(): ImageAnalysis.Analyzer {
         return FaceContourDetectionProcessor(binding.graphicOverlay)
     }
 
-    private fun takePhoto() {
-        val imageCapture = imageCapture ?: return
-        imageCapture.takePicture(cameraExecutor, object :
+    private suspend fun takePhoto(): Boolean {
+        val deferred = CompletableDeferred<Boolean>()
+        val imageCapture = imageCapture
+        imageCapture?.takePicture(cameraExecutor, object :
             ImageCapture.OnImageCapturedCallback() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
                 selfie = imageProxyToBitmap(image)
+                deferred.complete(true)
             }
         })
         Toast.makeText(context, "Selfie taken!", Toast.LENGTH_SHORT).show()
+        return deferred.await()
     }
 
     internal fun imageProxyToBitmap(image: ImageProxy): Bitmap {
@@ -162,7 +158,6 @@ class SelfieFragment : Fragment() {
             .setMessage(messageResId)
             .show()
     }
-
 
     override fun onDestroyView() {
         super.onDestroyView()
