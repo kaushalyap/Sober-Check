@@ -11,9 +11,10 @@ import android.util.Log
 
 class Sensor : SensorEventListener {
     internal val movement: ArrayList<AccelerationPoint> = ArrayList()
+    private lateinit var sensorManager: SensorManager
 
-    fun initSensorManager(activity: Activity) {
-        val sensorManager = activity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    fun registerSensor(activity: Activity) {
+        sensorManager = activity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         sensorManager.registerListener(
             this,
             sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
@@ -21,24 +22,28 @@ class Sensor : SensorEventListener {
         )
     }
 
-    private fun isUserStill() {
-
+    fun unRegisterSensor() {
+        sensorManager.unregisterListener(this)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
+
             val x = event.values[0]
             val y = event.values[1]
             val z = event.values[2]
             val point = AccelerationPoint(x, y, z)
-            Log.d(TAG, "X = $x, Y = $y + Z = $z")
-            movement.add(point)
+            Log.d(TAG, "timestamp = ${event.timestamp}, X = $x, Y = $y + Z = $z")
+            if (movement.size != 25)
+                movement.add(point)
+
+            Log.d(TAG, movement.size.toString())
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
 
     companion object {
-        private const val TAG = "Accelerometer"
+        private const val TAG = "Sensor"
     }
 }

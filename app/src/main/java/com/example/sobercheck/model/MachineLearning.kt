@@ -122,10 +122,11 @@ class MachineLearning {
         return imageProcessor.process(inputImageBuffer)
     }
 
-    fun predictFromAccelerometer(acceleration: ArrayList<AccelerationPoint>): Boolean {
+    suspend fun predictFromAccelerometer(acceleration: ArrayList<AccelerationPoint>): Boolean {
+        val deferred = CompletableDeferred<Boolean>()
 
 
-        return true
+        return deferred.await()
     }
 
     companion object {

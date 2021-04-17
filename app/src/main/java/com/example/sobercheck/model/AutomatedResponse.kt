@@ -14,17 +14,18 @@ class AutomatedResponse {
     fun respond(activity: Activity, context: Context, mediaPlayer: MediaPlayer) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-        val countDownTimer = object : CountDownTimer(CountDown.TIME.time, CountDown.STEP.time) {
-            override fun onTick(millisUntilFinished: Long) {}
+        val countDownTimer =
+            object : CountDownTimer(CountDown.TIME_5_SECONDS.time, CountDown.STEP.time) {
+                override fun onTick(millisUntilFinished: Long) {}
 
-            override fun onFinish() {
-                val alertOn = sharedPreferences.getBoolean(
-                    context.resources.getString(R.string.pref_alert),
-                    false
-                )
-                Log.d(TAG, "Alert ON : $alertOn")
-                val smsOn = sharedPreferences.getBoolean(
-                    context.resources.getString(R.string.pref_sms),
+                override fun onFinish() {
+                    val alertOn = sharedPreferences.getBoolean(
+                        context.resources.getString(R.string.pref_alert),
+                        false
+                    )
+                    Log.d(TAG, "Alert ON : $alertOn")
+                    val smsOn = sharedPreferences.getBoolean(
+                        context.resources.getString(R.string.pref_sms),
                     false
                 )
                 Log.d(TAG, "SMS ON : $alertOn")

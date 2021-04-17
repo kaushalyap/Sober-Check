@@ -110,7 +110,6 @@ class SelfieFragment : Fragment() {
                 deferred.complete(true)
             }
         })
-        Toast.makeText(context, "Selfie taken!", Toast.LENGTH_SHORT).show()
         return deferred.await()
     }
 

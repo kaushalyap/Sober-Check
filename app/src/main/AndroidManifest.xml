@@ -35,6 +35,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.SoberCheck"
+        android:name=".App"
         tools:ignore="AllowBackup">
         <meta-data
             android:name="com.google.mlkit.vision.DEPENDENCIES"
