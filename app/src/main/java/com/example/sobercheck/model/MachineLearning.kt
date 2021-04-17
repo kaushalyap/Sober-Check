@@ -1,20 +1,26 @@
 package com.example.sobercheck.model
 
 import android.graphics.Bitmap
-import android.graphics.Color
 import android.util.Log
-import com.google.firebase.ml.modeldownloader.CustomModel
 import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
 import com.google.firebase.ml.modeldownloader.DownloadType
 import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
+import kotlinx.coroutines.CompletableDeferred
+import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
+import org.tensorflow.lite.support.common.ops.NormalizeOp
+import org.tensorflow.lite.support.image.ImageProcessor
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.support.image.ops.ResizeOp
+import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
+import java.io.File
+
 
 class MachineLearning {
 
+    private lateinit var modelFile: File
     private lateinit var interpreter: Interpreter
-    private val labels: Array<String> = arrayOf("sober", "drunk")
+    private lateinit var inputImageBuffer: TensorImage
 
     fun downloadModels() {
         downloadSelfieModel()
@@ -26,18 +32,16 @@ class MachineLearning {
             .requireWifi()
             .build()
         FirebaseModelDownloader.getInstance()
-            .getModel(SELFIE_MODEL, DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND, conditions)
-            .addOnCompleteListener { customModel ->
-
-                customModel.addOnSuccessListener { model: CustomModel? ->
-                    val modelFile = model?.file
-                    if (modelFile != null) {
-                        interpreter = Interpreter(modelFile)
-                    }
-                }
+            .getModel(
+                SELFIE_QUANTIZED_MODEL,
+                DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND,
+                conditions
+            )
+            .addOnSuccessListener {
+                Log.d(TAG, "Selfie model downloaded successfully!")
             }
             .addOnFailureListener {
-                Log.d(TAG, "Internet is necessary to download the model!")
+                Log.d(TAG, "Selfie model download failed! probably no internet")
             }
     }
 
@@ -47,107 +51,89 @@ class MachineLearning {
             .build()
         FirebaseModelDownloader.getInstance()
             .getModel(ACCELERATOR_MODEL, DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND, conditions)
-            .addOnCompleteListener { customModel ->
-                customModel.addOnSuccessListener { model: CustomModel? ->
-                    val modelFile = model?.file
-                    if (modelFile != null) {
-                        interpreter = Interpreter(modelFile)
-                    }
-                }
+            .addOnSuccessListener {
+                Log.d(TAG, "Accelerator model downloaded successfully!")
             }
             .addOnFailureListener {
-                Log.d(TAG, "Internet is necessary to download the model!")
+                Log.d(TAG, "Accelerator model download failed! probably no internet")
             }
     }
 
-    fun predictFromSelfie(selfie: Bitmap): Boolean {
-        val bitmap = Bitmap.createScaledBitmap(selfie, 224, 224, true)
-        val input = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
-        for (y in 0 until 224) {
-            for (x in 0 until 224) {
-                val px = bitmap.getPixel(x, y)
+    suspend fun predictFromSelfie(selfie: Bitmap): Boolean {
 
-                val r = Color.red(px)
-                val g = Color.green(px)
-                val b = Color.blue(px)
+        val deferred = CompletableDeferred<Boolean>()
+        val conditions = CustomModelDownloadConditions.Builder()
+            .requireWifi()
+            .build()
 
-                val rf = (r - 127) / 255f
-                val gf = (g - 127) / 255f
-                val bf = (b - 127) / 255f
+        FirebaseModelDownloader.getInstance()
+            .getModel(
+                SELFIE_QUANTIZED_MODEL,
+                DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND,
+                conditions
+            )
+            .addOnSuccessListener { customModel ->
 
-                input.putFloat(rf)
-                input.putFloat(gf)
-                input.putFloat(bf)
+                modelFile = (customModel.file ?: return@addOnSuccessListener)
+                Log.d(TAG, modelFile.name)
+                interpreter = Interpreter(modelFile)
+
+                createInputTensor(selfie)
+
+                val outputProbabilityBuffer =
+                    TensorBuffer.createFixedSize(intArrayOf(1, 106, 106), DataType.FLOAT32)
+
+                interpreter.run(inputImageBuffer.buffer, outputProbabilityBuffer.buffer)
+
+                var isDrunk = false
+                if (outputProbabilityBuffer.floatArray[0] >= .5) {
+                    isDrunk = true
+                    Log.d(
+                        TAG,
+                        "Drunk, probability : " + outputProbabilityBuffer.floatArray[0].toString()
+                    )
+                } else
+                    Log.d(
+                        TAG,
+                        "Sober, probability : " + outputProbabilityBuffer.floatArray[0].toString()
+                    )
+                deferred.complete(isDrunk)
             }
-        }
+            .addOnFailureListener {
+                Log.d(TAG, it.message.toString())
+            }
 
-        val bufferSize = 1000 * java.lang.Float.SIZE / java.lang.Byte.SIZE
-        val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
-        interpreter.run(input, modelOutput)
+        return deferred.await()
+    }
 
-        var label = ""
-        var newLabel = ""
-        var probability = 0f
-        var highestProbability = 0f
+    private fun createInputTensor(selfie: Bitmap) {
+        val imageDataType = interpreter.getInputTensor(0).dataType()
+        inputImageBuffer = TensorImage(imageDataType)
+        inputImageBuffer.load(selfie)
+        inputImageBuffer = normalizeImage()
+    }
 
-        modelOutput.rewind()
-        val results = modelOutput.asFloatBuffer()
+    private fun normalizeImage(): TensorImage {
+        val imageProcessor: ImageProcessor = ImageProcessor.Builder()
+            .add(ResizeOp(106, 106, ResizeOp.ResizeMethod.NEAREST_NEIGHBOR))
+            .add(NormalizeOp(127.5f, 127.5f))
+            .build()
 
-//        for (i in results.capacity()) {
-//            label = labels[i]
-//            probability = results.get(i)
-//
-//            if (probability > highestProbability) {
-//                highestProbability = probability
-//                newLabel = label
-//            }
-//        }
-        return newLabel != "sober"
+        return imageProcessor.process(inputImageBuffer)
     }
 
     fun predictFromAccelerometer(acceleration: ArrayList<AccelerationPoint>): Boolean {
 
-        val x = FloatArray(10)
-        val y = FloatArray(10)
-        val z = FloatArray(10)
 
-        var count = 0
-        for (point in acceleration) {
-            x[count] = point.x
-            y[count] = point.y
-            z[count] = point.z
-            count += 1
-        }
-
-        val input: Array<FloatArray> = arrayOf(x, y, z)
-
-        val bufferSize = 1000 * java.lang.Float.SIZE / java.lang.Byte.SIZE
-        val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
-        interpreter.run(input, modelOutput)
-
-        var label = ""
-        var newLabel = ""
-        var probability = 0f
-        var highestProbability = 0f
-
-        modelOutput.rewind()
-        val results = modelOutput.asFloatBuffer()
-
-//        for (i in results.capacity()) {
-//            label = labels[i]
-//            probability = results.get(i)
-//
-//            if (probability > highestProbability) {
-//                highestProbability = probability
-//                newLabel = label
-//            }
-//        }
-        return newLabel != "sober"
+        return true
     }
 
     companion object {
         private const val TAG = "MachineLearning"
+
+        @Suppress("unused")
         private const val SELFIE_MODEL = "selfie"
+        private const val SELFIE_QUANTIZED_MODEL = "selfie-quantized"
         private const val ACCELERATOR_MODEL = "accel"
     }
 }

@@ -18,11 +18,13 @@ import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSelfieBinding
 import com.example.sobercheck.model.MachineLearning
 import com.example.sobercheck.utils.FaceContourDetectionProcessor
+import kotlinx.coroutines.launch
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.ktx.PermissionsRequester
 import permissions.dispatcher.ktx.constructPermissionsRequest
@@ -51,18 +53,22 @@ class SelfieFragment : Fragment() {
             val timer = object : CountDownTimer(3000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
                 override fun onFinish() {
-                    val drunkFromSelfie = MachineLearning().predictFromSelfie(selfie)
-                    val action =
-                        SelfieFragmentDirections.actionSelfieToWalkingExercise(drunkFromSelfie)
-                    findNavController().navigate(action)
+
+                    lifecycleScope.launch {
+                        val prediction = MachineLearning().predictFromSelfie(selfie)
+
+                        val action =
+                            SelfieFragmentDirections.actionSelfieToWalkingExercise(prediction)
+
+                        findNavController().navigate(action)
+                    }
                 }
             }
             timer.start()
         }
+
         cameraExecutor = Executors.newSingleThreadExecutor()
-
         cameraPermissionsRequester.launch()
-
         return binding.root
     }
 
@@ -107,9 +113,9 @@ class SelfieFragment : Fragment() {
             override fun onCaptureSuccess(image: ImageProxy) {
                 super.onCaptureSuccess(image)
                 selfie = imageProxyToBitmap(image)
-                Toast.makeText(context, "Selfie taken!", Toast.LENGTH_SHORT).show()
             }
         })
+        Toast.makeText(context, "Selfie taken!", Toast.LENGTH_SHORT).show()
     }
 
     internal fun imageProxyToBitmap(image: ImageProxy): Bitmap {
