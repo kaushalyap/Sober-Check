@@ -58,7 +58,7 @@ class WalkingExerciseFragment : Fragment() {
         sensor.registerSensor(requireActivity())
 
         val countDownTimer =
-            object : CountDownTimer(CountDown.TIME_5_SECONDS.time, CountDown.STEP.time) {
+            object : CountDownTimer(CountDown.TIME_10_SECONDS.time, CountDown.STEP.time) {
 
                 override fun onTick(millisUntilFinished: Long) {}
                 override fun onFinish() {

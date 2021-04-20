@@ -32,9 +32,10 @@ class Sensor : SensorEventListener {
             val x = event.values[0]
             val y = event.values[1]
             val z = event.values[2]
-            val point = AccelerationPoint(x, y, z)
             Log.d(TAG, "timestamp = ${event.timestamp}, X = $x, Y = $y + Z = $z")
-            if (movement.size != 25)
+
+            val point = AccelerationPoint(x, y, z)
+            if (movement.size != 50)
                 movement.add(point)
 
             Log.d(TAG, movement.size.toString())
