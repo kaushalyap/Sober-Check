@@ -2,6 +2,7 @@ package com.example.sobercheck.ui.fragments
 
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,7 +21,7 @@ class WalkingExerciseFragment : Fragment() {
 
     private lateinit var sensor: Sensor
     private var _binding: FragmentWalkingExerciseBinding? = null
-    private val binding get() = _binding!!
+    internal val binding get() = _binding!!
     private val args: SelfieFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -33,17 +34,22 @@ class WalkingExerciseFragment : Fragment() {
     }
 
     private fun init() {
-        collectAccelerometerReadings()
         setOnClickListener()
     }
 
     private fun setOnClickListener() {
+        collectAccelerometerReadings()
         binding.btnDone.setOnClickListener {
             lifecycleScope.launch {
                 val isDrunkFromSelfie = args.isDrunkFromSelfie
-                var isDrunkFromAccelerometer =
+                val isDrunkFromAccelerometer =
                     MachineLearning().predictFromAccelerometer(sensor.movement)
-                if (isDrunkFromAccelerometer && isDrunkFromSelfie) {
+
+                Log.d(
+                    TAG,
+                    "IsDrunkFromSelfie : $isDrunkFromSelfie, IsDrunkFromAccel : $isDrunkFromAccelerometer"
+                )
+                if (isDrunkFromAccelerometer || isDrunkFromSelfie) {
                     findNavController().navigate(R.id.action_walkingExercise_to_drunk)
                 } else {
                     findNavController().navigate(R.id.action_walkingExercise_to_sober)
@@ -59,9 +65,14 @@ class WalkingExerciseFragment : Fragment() {
         val countDownTimer =
             object : CountDownTimer(CountDown.TIME_10_SECONDS.time, CountDown.STEP.time) {
 
-                override fun onTick(millisUntilFinished: Long) {}
+                override fun onTick(millisUntilFinished: Long) {
+                    val inSeconds = millisUntilFinished / 1000
+                    binding.txtCountDown.text = "$inSeconds seconds"
+                }
+
                 override fun onFinish() {
                     sensor.unRegisterSensor()
+                    binding.btnDone.visibility = View.VISIBLE
                 }
             }
         countDownTimer.start()

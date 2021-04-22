@@ -50,5 +50,6 @@
     <string name="permission_internet_denied">Internet permission was denied!</string>
     <string name="permission_internet_address_rationale">Internet permission is required to generate pickup address.</string>
     <string name="permission_internet_model_download_rationale">Internet permission is required to download machine learning model for the first time.</string>
+    <string name="_10_seconds">10 seconds</string>
 
 </resources>

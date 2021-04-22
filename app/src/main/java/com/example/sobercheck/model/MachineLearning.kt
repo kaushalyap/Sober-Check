@@ -17,9 +17,6 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.MutableMap
-import kotlin.collections.maxOrNull
-import kotlin.collections.minOrNull
 import kotlin.collections.set
 import kotlin.math.abs
 
@@ -159,6 +156,9 @@ class MachineLearning {
     }
 
     suspend fun predictFromAccelerometer(acceleration: ArrayList<AccelerationPoint>): Boolean {
+
+        Log.d(TAG, "Number of points : ${acceleration.size}")
+
         val deferred = CompletableDeferred<Boolean>()
         val accelInputs = generateAccelFeatureInputs(acceleration)
 
@@ -300,9 +300,9 @@ class MachineLearning {
         )
 
 
-//        for (input in inputs) {
-//            Log.d(TAG, "$input")
-//        }
+        for (input in inputs) {
+            Log.d(TAG, "$input")
+        }
 
         return inputs
     }
