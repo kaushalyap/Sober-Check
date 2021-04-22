@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.example.sobercheck.R
 import com.example.sobercheck.databinding.FragmentSoberBinding
 
 class SoberFragment : Fragment() {
@@ -18,6 +20,9 @@ class SoberFragment : Fragment() {
     ): View {
 
         _binding = FragmentSoberBinding.inflate(inflater, container, false)
+        binding.btnDone.setOnClickListener {
+            findNavController().popBackStack(R.id.mainFragment, false)
+        }
         return binding.root
     }
 

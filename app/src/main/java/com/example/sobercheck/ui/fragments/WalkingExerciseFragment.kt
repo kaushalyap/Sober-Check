@@ -39,16 +39,15 @@ class WalkingExerciseFragment : Fragment() {
 
     private fun setOnClickListener() {
         binding.btnDone.setOnClickListener {
-            val isDrunkFromSelfie = args.isDrunkFromSelfie
-            var isDrunkFromAccelerometer: Boolean? = null
             lifecycleScope.launch {
-                isDrunkFromAccelerometer =
+                val isDrunkFromSelfie = args.isDrunkFromSelfie
+                var isDrunkFromAccelerometer =
                     MachineLearning().predictFromAccelerometer(sensor.movement)
-            }
-            if ((isDrunkFromAccelerometer ?: return@setOnClickListener) && isDrunkFromSelfie) {
-                findNavController().navigate(R.id.action_walkingExercise_to_drunk)
-            } else {
-                findNavController().navigate(R.id.action_walkingExercise_to_sober)
+                if (isDrunkFromAccelerometer && isDrunkFromSelfie) {
+                    findNavController().navigate(R.id.action_walkingExercise_to_drunk)
+                } else {
+                    findNavController().navigate(R.id.action_walkingExercise_to_sober)
+                }
             }
         }
     }
